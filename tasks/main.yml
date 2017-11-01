@@ -4,7 +4,18 @@
     name: "{{ sonar_mysql_database }}"
     state: present
 
-- name: Create a sonar user.
+- name: Create sonar group
+  group:
+    name: "{{sonar_process_group}}"
+    state: present
+
+- name: Create sonar user
+  user:
+    name: "{{sonar_process_user}}"
+    group: "{{sonar_process_group}}"
+    home: /usr/local/sonar
+
+- name: Create a sonar mysql user.
   mysql_user:
     name: "{{ sonar_mysql_username }}"
     host: "{{ item }}"
@@ -29,6 +40,14 @@
   shell: >
     mv /usr/local/{{ sonar_version_directory }} /usr/local/sonar
     creates=/usr/local/sonar/COPYING
+
+- name: Change Owner of sonar
+  file:
+    dest: /usr/local/sonar
+    owner: "{{sonar_process_user}}"
+    group: "{{sonar_process_group}}"
+    mode: 0775
+    recurse: yes
 
 - include: configure.yml
 
