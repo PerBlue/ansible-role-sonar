@@ -48,6 +48,11 @@ The value of `sonar.web.context`. Setting this to something like `/sonar` allows
 
 JDBC settings for a connection to a MySQL database. Defaults presume the database resides on localhost and is only accessible on the SonarQube server itself.
 
+The sonar process user and group can be set with the following variables.
+
+    sonar_process_user: sonar
+    sonar_process_group: sonar
+
 ## Dependencies
 
   - geerlingguy.java

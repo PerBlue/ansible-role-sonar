@@ -16,7 +16,21 @@
         - curl
         - unzip
 
+    - name: Override varaibles for MySQL (Debian)
+      set_fact:
+        mysql_packages:
+          - mysql-server-5.6
+      when: ansible_os_family == "Debian" and ansible_distribution_version == "14.04"
+
   roles:
-    - geerlingguy.java
+    - role: geerlingguy.java
+      when: "ansible_os_family == 'RedHat'"
+      java_packages:
+        - java-1.8.0-openjdk
+
+    - role: geerlingguy.java
+      when: "ansible_os_family == 'Debian'"
+      java_packages:
+        - openjdk-8-jdk
     - geerlingguy.mysql
     - role_under_test
