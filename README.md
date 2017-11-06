@@ -66,6 +66,47 @@ The sonar process user and group can be set with the following variables.
 
 Using the defaults, you can view the SonarQube home at `http://localhost:9000/` (default System administrator credentials are `admin`/`admin`).
 
+### Running on Debian(-like) systems with SonarQube 5.6+
+
+    - name: Override variabeles for MySQL (Debian)
+      set_fact:
+        mysql_packages:
+          - mysql-server-5.6
+      when: ansible_os_family == "Debian"
+      
+### Running on RedHat based systems with SonarQube 5.6
+
+    pre_tasks:
+    
+    - name: setup other repo for mysql
+      copy:
+        content: |
+          [mysql56-community]
+          name=MySQL 5.6 Community Server
+          baseurl=http://repo.mysql.com/yum/mysql-5.6-community/el/7/$basearch/
+          enabled=1
+          gpgcheck=1
+          gpgkey=http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x8C718D3B5072E1F5
+        dest: /etc/yum.repos.d/mysql56-community.repo
+      when: "ansible_os_family == 'RedHat'"
+
+    - name: setup new version of mariadb
+      file:
+        path: /var/run/mariadb/
+        state: directory
+        mode: 0777
+      when: "ansible_os_family == 'RedHat'"
+
+    - name: Define mysql_log_error.
+      set_fact:
+        mysql_log_error: /var/log/mariadb.log
+        mysql_daemon: mysqld
+        mysql_packages:
+          - mysql
+          - mysql-community-server
+          - mysql-community-libs
+      when: "ansible_os_family == 'RedHat'"
+
 ## License
 
 MIT / BSD
