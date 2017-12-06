@@ -53,6 +53,10 @@ The sonar process user and group can be set with the following variables.
     sonar_process_user: sonar
     sonar_process_group: sonar
 
+    sonar_install_method: "move"
+
+The way you want the install to be done. By default **move** is a rename of the versionned directory into _sonar_. You can set to **link** to create a symlink _sonar_ targeting the versionned directory. You can set to **copy** to copy the versionned directory into _sonar_ and remove the versionned directory (use case: dedicated filesystem).
+
 ## Dependencies
 
   - geerlingguy.java
