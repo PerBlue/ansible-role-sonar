@@ -1,7 +1,7 @@
 ---
 dependencies:
   - geerlingguy.java
-  - geerlingguy.mysql
+  - { role: 'geerlingguy.mysql', when: sonar_mysql_install == "yes" }
 
 galaxy_info:
   author: geerlingguy
