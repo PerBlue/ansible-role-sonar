@@ -1,10 +1,28 @@
 ---
+- name: Set correct Java version
+  alternatives:
+    name: java
+    path: /usr/lib/jvm/java-1.8.0-openjdk-amd64/jre/bin/java
+  when: ansible_os_family == 'Debian' and ansible_distribution_version == "14.04"
+
 - name: Create a database for Sonar.
   mysql_db:
     name: "{{ sonar_mysql_database }}"
     state: present
 
-- name: Create a sonar user.
+- name: Create sonar group
+  group:
+    name: "{{sonar_process_group}}"
+    state: present
+
+- name: Create sonar user
+  user:
+    name: "{{sonar_process_user}}"
+    group: "{{sonar_process_group}}"
+    home: /usr/local/sonar
+    createhome: no
+
+- name: Create a sonar mysql user.
   mysql_user:
     name: "{{ sonar_mysql_username }}"
     host: "{{ item }}"
@@ -30,6 +48,15 @@
     mv /usr/local/{{ sonar_version_directory }} /usr/local/sonar
     creates=/usr/local/sonar/COPYING
 
+- name: Change Owner of sonar
+  file:
+    dest: /usr/local/sonar
+    owner: "{{sonar_process_user}}"
+    group: "{{sonar_process_group}}"
+    mode: 0775
+    recurse: yes
+  changed_when: false
+
 - include: configure.yml
 
 - name: Symlink sonar bin.
@@ -44,6 +71,13 @@
     src: /usr/local/sonar/bin/linux-x86-64/sonar.sh
     dest: /etc/init.d/sonar
     state: link
+  when: "ansible_service_mgr != 'systemd'"
+
+- name: Find and replace runasuser in service  management
+  lineinfile:
+    path: /etc/init.d/sonar
+    regexp: '^#?RUN_AS_USER='
+    line: "RUN_AS_USER={{sonar_process_user}}"
   when: "ansible_service_mgr != 'systemd'"
 
 - name: Copy SonarQube systemd unit file into place (for systemd systems).
