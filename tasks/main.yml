@@ -74,6 +74,10 @@
     src: /usr/local/{{ sonar_version_directory }}
     dest: /usr/local/sonar
     state: link
+    owner: "{{sonar_process_user}}"
+    group: "{{sonar_process_group}}"
+    mode: 0775
+    recurse: yes
   when: sonar_install_method == 'link'
 
 - name: Change Owner of sonar
@@ -84,6 +88,7 @@
     mode: 0775
     recurse: yes
   changed_when: false
+  when: (sonar_install_method == 'move' or sonar_install_method == 'copy')
 
 - include: configure.yml
 
