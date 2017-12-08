@@ -77,7 +77,7 @@
     owner: "{{sonar_process_user}}"
     group: "{{sonar_process_group}}"
     mode: 0775
-    recurse: yes
+    follow: yes
   when: sonar_install_method == 'link'
 
 - name: Change Owner of sonar
