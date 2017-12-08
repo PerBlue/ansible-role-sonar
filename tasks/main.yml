@@ -90,6 +90,16 @@
   changed_when: false
   when: (sonar_install_method == 'move' or sonar_install_method == 'copy')
 
+- name: Change Owner of sonar
+  file:
+    dest: /usr/local/{{ sonar_version_directory }}
+    owner: "{{sonar_process_user}}"
+    group: "{{sonar_process_group}}"
+    mode: 0775
+    recurse: yes
+  changed_when: false
+  when: sonar_install_method == 'link'
+
 - include: configure.yml
 
 - name: Symlink sonar bin.
